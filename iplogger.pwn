@@ -38,6 +38,11 @@ new
 public OnFilterScriptInit()
 {
     MySQLConnection();
+    mysql_tquery(Database,"CREATE TABLE IF NOT EXISTS`iplogger`\
+    (`Name` varchar(30) NOT NULL,\
+    `IP` varchar(17) NOT NULL,\
+    `Connected` varchar(32) NOT NULL,\
+    `Disconnected` varchar(32) NOT NULL)");
     return 1;
 }
 
@@ -105,9 +110,9 @@ ReturnDate()
 
 g_IPDialog(playerid)
 {
-    new query[128], title[48], string[128], dialog[1200];
-    mysql_format(Database, query, sizeof(query), "SELECT * FROM `iplogger` WHERE `Name` = '%e' LIMIT %d, 10", g_TargetID[playerid], g_DialogPage[playerid] * 10);
-	mysql_query(Database, query);
+    new query[128], title[48], string[128], dialog[1200], Cache: ip_logs;
+    mysql_format(Database, query, sizeof(query), "SELECT `IP`, `Connected` FROM `iplogger` WHERE `Name` = '%e' LIMIT %d, 10", g_TargetID[playerid], g_DialogPage[playerid] * 10);
+	ip_logs = mysql_query(Database, query);
 	new rows = cache_num_rows();
 	if(rows) 
     {
@@ -138,21 +143,22 @@ g_IPDialog(playerid)
             SendClientMessage(playerid, 0xDE3838FF, str);
         }
     }
+    cache_delete(ip_logs);
     return 1;
 }
 
 public OnPlayerConnect(playerid)
 {
-    g_ConnectionDate[playerid] = ReturnDate();
-    g_pIP[playerid] = ReturnIP(playerid);
+    strcat(g_pIP[playerid], ReturnIP(playerid));
+    strcat(g_ConnectionDate[playerid], ReturnDate());
     return 1;
 }
 
 public OnPlayerDisconnect(playerid, reason)
 {
     new query[200];
-    g_DisconnectionDate[playerid] = ReturnDate();
-	mysql_format(Database, query, sizeof(query), "INSERT INTO `iplogger` (`Name`, `IP`, `Connected`, `Disconnected`) VALUES ('%e', '%e', '%e', '%e')",
+    strcat(g_DisconnectionDate[playerid], ReturnDate());
+	mysql_format(Database, query, sizeof(query), "INSERT INTO `iplogger` (`Name`, `IP`, `Connected`, `Disconnected`) VALUES ('%s', '%s', '%s', '%s')",
     ReturnName(playerid), g_pIP[playerid], g_ConnectionDate[playerid], g_DisconnectionDate[playerid]);
 	mysql_tquery(Database, query);
     return 1;
@@ -175,9 +181,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 if(sscanf(inputtext, "s[24]", g_TargetID[playerid]))
                     return 1;
 
-                new title[64], query[128], dialog[256];
-                mysql_format(Database, query, sizeof(query), "SELECT * FROM `iplogger` WHERE `Name` = '%e'", g_TargetID[playerid]);
-                mysql_query(Database, query);
+                new title[64], query[128], dialog[256], Cache: ip_logs;
+                mysql_format(Database, query, sizeof(query), "SELECT `IP`, `Connected` FROM `iplogger` WHERE `Name` = '%e'", g_TargetID[playerid]);
+                ip_logs = mysql_query(Database, query);
                 new rows = cache_num_rows();
                 
                 if(!rows)
@@ -186,6 +192,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 format(title, sizeof(title), "IP Logs Panel - Managing player {2ECC71}%s", g_TargetID[playerid]);
                 format(dialog, sizeof(dialog), "  {FFFF00}> {FFFFFF}Show {2ECC71}%s{FFFFFF}'s IP Logs\n  {FFFF00}> {DE3838}Delete {2ECC71}%s{DE3838}'s IP Logs", g_TargetID[playerid], g_TargetID[playerid]);
                 ShowPlayerDialog(playerid, DIALOG_IPACTION, DIALOG_STYLE_LIST, title, dialog, "Submit", "Cancel");
+                cache_delete(ip_logs);
             }
         }
         case DIALOG_IPLOGS:
@@ -226,11 +233,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
         {
             if(response)
             {
-                new query[128], string[128];
+                new query[128], string[128], Cache:ip_logs;
                 mysql_format(Database, query, sizeof(query), "DELETE FROM iplogger WHERE Name='%e'", g_TargetID[playerid]);
-                mysql_query(Database, query);
+                ip_logs = mysql_query(Database, query);
                 format(string, sizeof(string), "INFO: {FFFFFF}You have successfully {DE3838}deleted {AFAFAF}%s{FFFFFF}'s logs.", g_TargetID[playerid]);
                 SendClientMessage(playerid, 0x33CCFFFF, string);
+                cache_delete(ip_logs);
             }
             else
                 SendClientMessage(playerid, 0x33CCFFFF, "INFO: {FFFFFF}You have canceled the logs deletion.");
