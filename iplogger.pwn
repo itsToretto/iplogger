@@ -1,3 +1,13 @@
+/*
+	https://forum.sa-mp.com/showthread.php?t=660401
+	
+	If you're planning to re-work or implement my code, you can submit a pull request,
+	or ask me for the permission throught my Discord: Toretto#9902
+	
+	Feel free to use it for your gamemode, but don't claim it yours, keep those commented,
+	lines, there are no credits in the code. 
+*/
+
 #include <a_samp>
 #include <a_mysql>
 #include <zcmd>
