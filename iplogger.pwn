@@ -6,6 +6,8 @@
 
 	Feel free to use it for your gamemode, but don't claim it yours, keep those commented,
 	lines, there are no credits in the code.
+	
+	Big thanks to Calisthenics for his optimization to the code <3
 */
 
 #include <a_samp>
