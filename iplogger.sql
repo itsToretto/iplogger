@@ -29,10 +29,11 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `iplogger` (
-  `Name` varchar(30) NOT NULL,
-  `IP` varchar(17) NOT NULL,
-  `Connected` varchar(32) NOT NULL,
-  `Disconnected` varchar(32) NOT NULL
+  `Name` varchar(24) NOT NULL,
+  `IP` int(10) unsigned NOT NULL,
+  `Connected` datetime NOT NULL,
+  `Disconnected` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`Name`,`Connected`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 COMMIT;
 
