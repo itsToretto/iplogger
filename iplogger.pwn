@@ -78,13 +78,15 @@ ReturnName(playerid)
 
 ShowIpLogsDialog(playerid)
 {
-    new query[157];
+    new query[181];
     mysql_format(Database, query, sizeof(query),
         "SELECT \
                 INET_NTOA(IP) AS IP, \
                 DATE_FORMAT(Connected, '%%Y %%M %%e - %%T') AS Connected \
            FROM iplogger \
-          WHERE Name = '%e' LIMIT %d, 10",
+          WHERE Name = '%e' \
+          ORDER BY Connected DESC \
+          LIMIT %d, 10",
     g_Target[playerid], g_DialogPage[playerid] * 10);
     mysql_tquery(Database, query, "OnIpLogsDisplay", "d", playerid);
     return 1;
