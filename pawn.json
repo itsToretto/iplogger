@@ -1,0 +1,12 @@
+{
+	"user": "itsToretto",
+	"repo": "iplogger",
+	"entry": "test.pwn",
+	"output": "test.amx",
+	"dependencies": [
+		"sampctl/samp-stdlib",
+		"pBlueG/SA-MP-MySQL:R41-4",
+		"Southclaws/zcmd",
+		"maddinat0r/sscanf:v2.8.3"
+	]
+}
