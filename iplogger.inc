@@ -10,7 +10,15 @@
 	Big thanks to Calisthenics for his optimization to the code <3
 */
 
-#include <a_samp>
+#if defined _inc_iplogger
+	#undef _inc_iplogger
+#endif 
+
+#if defined iplogger_included
+	#endinput
+#endif
+#define iplogger_included
+
 #include <a_mysql>
 #include <zcmd>
 #include <sscanf2>
@@ -107,12 +115,6 @@ public OnPlayerDisconnect(playerid, reason)
     mysql_format(Database, query, sizeof(query), "INSERT INTO iplogger (Name, IP, Connected) VALUES ('%s', INET_ATON('%s'), FROM_UNIXTIME(%d))",
     ReturnName(playerid), g_pIP[playerid], g_ConnectionDate[playerid]);
     mysql_tquery(Database, query);
-    return 1;
-}
-
-CMD:ips(playerid, params[])
-{
-    ShowPlayerDialog(playerid, DIALOG_IPINDEX, DIALOG_STYLE_INPUT, "IP Logger - Index", "{FFFFFF}Enter the player's full name below:", "Submit", "Cancel");
     return 1;
 }
 
