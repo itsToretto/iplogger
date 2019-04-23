@@ -1,6 +1,6 @@
 /*
+	https://www.burgershot.gg/showthread.php?tid=443
 	https://forum.sa-mp.com/showthread.php?t=660401
-    *burgershot link*
 
 	If you're planning to re-work or implement my code, you can submit a pull request,
 	or ask me for the permission throught my Discord: Toretto#9902
