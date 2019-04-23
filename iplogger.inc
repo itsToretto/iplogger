@@ -1,5 +1,6 @@
 /*
 	https://forum.sa-mp.com/showthread.php?t=660401
+    *burgershot link*
 
 	If you're planning to re-work or implement my code, you can submit a pull request,
 	or ask me for the permission throught my Discord: Toretto#9902
@@ -20,8 +21,8 @@
 #define iplogger_included
 
 #include <a_mysql>
-#include <zcmd>
 #include <sscanf2>
+#include <zcmd>
 
 #define MYSQL_HOSTNAME		"localhost"
 #define MYSQL_USERNAME		"root"
@@ -44,7 +45,7 @@ new
     g_DialogPage[MAX_PLAYERS],
     g_Target[MAX_PLAYERS][MAX_PLAYER_NAME];
 
-public OnFilterScriptInit()
+public OnGameModeInit()
 {
     MySQLConnection();
     mysql_tquery(Database,
@@ -55,14 +56,23 @@ public OnFilterScriptInit()
            `Disconnected` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP, \
           PRIMARY KEY (`Name`,`Connected`) \
          )");
+    
+    #if defined IPLogger_OnGameModeInit
+        IPLogger_OnGameModeInit();
+    #endif
     return 1;
 }
 
-public OnFilterScriptExit()
-{
-    mysql_close(Database);
-    return 1;
-}
+#if defined _ALS_OnGameModeInit
+    #undef OnGameModeInit
+#else
+    #define _ALS_OnGameModeInit
+#endif
+#define OnGameModeInit IPLogger_OnGameModeInit
+
+#if defined IPLogger_OnGameModeInit
+    forward IPLogger_OnGameModeInit();
+#endif
 
 MySQLConnection()
 {
@@ -71,8 +81,8 @@ MySQLConnection()
     Database = mysql_connect(MYSQL_HOSTNAME, MYSQL_USERNAME, MYSQL_PASSWORD, MYSQL_DATABASE);
     if (Database == MYSQL_INVALID_HANDLE || mysql_errno(Database) != 0)
     {
-        print("[iplogger] MySQL connection failed. Filterscript is being unloaded.");
-        return SendRconCommand("unloadfs iplogger");
+        return print("[iplogger] MySQL connection failed.");
+        // return SendRconCommand("unloadfs iplogger");
     }
     return 1;
 }
@@ -106,8 +116,23 @@ public OnPlayerConnect(playerid)
     g_ConnectionDate[playerid] = gettime();
     g_DialogPage[playerid] = 0;
     g_Target[playerid][0] = '\0';
+
+    #if defined IPLogger_OnPlayerConnect
+        IPLogger_OnPlayerConnect(playerid);
+    #endif
     return 1;
 }
+
+#if defined _ALS_OnPlayerConnect
+    #undef OnPlayerConnect
+#else
+    #define _ALS_OnPlayerConnect
+#endif
+#define OnPlayerConnect IPLogger_OnPlayerConnect
+
+#if defined IPLogger_OnPlayerConnect
+    forward IPLogger_OnPlayerConnect(playerid);
+#endif
 
 public OnPlayerDisconnect(playerid, reason)
 {
@@ -115,11 +140,25 @@ public OnPlayerDisconnect(playerid, reason)
     mysql_format(Database, query, sizeof(query), "INSERT INTO iplogger (Name, IP, Connected) VALUES ('%s', INET_ATON('%s'), FROM_UNIXTIME(%d))",
     ReturnName(playerid), g_pIP[playerid], g_ConnectionDate[playerid]);
     mysql_tquery(Database, query);
+    #if defined IPLogger_OnPlayerDisconnect
+        IPLogger_OnPlayerDisconnect(playerid, reason);
+    #endif
     return 1;
 }
 
+#if defined _ALS_OnPlayerDisconnect
+    #undef OnPlayerDisconnect
+#else
+    #define _ALS_OnPlayerDisconnect
+#endif
+#define OnPlayerDisconnect IPLogger_OnPlayerDisconnect
+
+#if defined IPLogger_OnPlayerDisconnect
+    forward IPLogger_OnPlayerDisconnect(playerid, reason);
+#endif
+
 public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
-{
+{    
     switch(dialogid)
     {
         case DIALOG_IPINDEX:
@@ -183,8 +222,23 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
         }
         default: return 0;
     }
+    #if defined IPLogger_OnDialogResponse
+		IPLogger_OnDialogResponse(playerid, dialogid, response, listitem, inputtext);
+    #endif
     return 1;
 }
+
+#if defined _ALS_OnDialogResponse
+	#undef OnDialogResponse
+#else
+	#define _ALS_OnDialogResponse
+#endif
+
+#define OnDialogResponse IPLogger_OnDialogResponse
+
+#if defined IPLogger_OnDialogResponse
+	forward IPLogger_OnDialogResponse(playerid, dialogid, response, listitem, inputtext[]);
+#endif
 
 forward OnIpLogsDisplay(playerid);
 public OnIpLogsDisplay(playerid)
