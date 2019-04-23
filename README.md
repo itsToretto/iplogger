@@ -6,8 +6,11 @@ What it does is basically, every time someone connects to the server, when he di
 ## Screenshots
 
 ![alt text](https://i.imgur.com/jXYVl7z.png) 
+
 ![alt text](https://i.imgur.com/PqdXJwM.png)
+
 ![alt text](https://i.imgur.com/SvUqOyl.png)
+
 ![alt text](https://i.imgur.com/IYxj9fZ.png)
 
 ## Dependencies
